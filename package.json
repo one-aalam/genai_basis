@@ -10,6 +10,10 @@
     "db:seed": "tsx --env-file=.env scripts/seed.ts",
     "db:generate": "npx drizzle-kit generate",
     "db:push": "npx drizzle-kit push",
+    "db:pull": "drizzle-kit introspect",
+    "db:drop": "drizzle-kit drop",
+    "db:studio": "drizzle-kit studio",
+    "db:check": "drizzle-kit check",
     "ui:add": "npx shadcn-ui@latest add",
     "ui:list": "npx shadcn-ui@latest list"
   },
