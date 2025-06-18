@@ -1,5 +1,10 @@
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { embed, embedMany } from 'ai';
+
+const ollama = createOpenAI({
+  baseURL: process.env.OLLAMA_BASE_URL || "http://localhost:11434/v1",
+  apiKey: "ollama",
+});
 
 /**
  * Generate vector embeddings for text using OpenAI's embedding model
@@ -15,7 +20,7 @@ export const generateEmbedding = async (text: string): Promise<number[]> => {
     }
 
     const response = await embed({
-        model: openai.embedding('text-embedding-ada-002'), // OpenAI's most cost-effective embedding model
+        model: ollama.embedding('nomic-embed-text:latest'), // OpenAI's most cost-effective embedding model
         value: cleanText,
     });
 
@@ -30,7 +35,7 @@ export const generateEmbeddings = async (source: string[]): Promise<number[][]> 
   try {
 
     const response = await embedMany({
-        model: openai.embedding('text-embedding-ada-002'), // OpenAI's most cost-effective embedding model
+        model: ollama.embedding('nomic-embed-text:latest'), // OpenAI's most cost-effective embedding model
         values: source,
     });
 
