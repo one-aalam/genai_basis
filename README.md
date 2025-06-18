@@ -38,6 +38,13 @@ CREATE EXTENSION IF NOT EXISTS vector;
 CREATE INDEX ON documents USING ivfflat (embedding vector_cosine_ops)
 WITH (lists = 100);
 ```
+
+You can also do a
+```bash
+npx drizzle-kit generate --custom
+```
+to create a custom migration file, and put the above instructions.
+
 Now generate and run our migrations:
 
 ```bash
@@ -47,6 +54,7 @@ npm run db:generate
 # Push the schema to your database
 npm run db:push
 ```
+
 ## Your Learning Journey
 ### Connect with OpenAI (default)
 
