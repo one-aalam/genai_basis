@@ -4,7 +4,9 @@ export const documents = pgTable(
   'documents',
   {
     id: serial('id').primaryKey(),
-    // @TODO: fill in your document properties
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    url: text('url'),
     // Vector embedding with 1536 dimensions (OpenAI's text-embedding-ada-002 size)
     embedding: vector('embedding', { dimensions: 1536 }),
     createdAt: timestamp('created_at').defaultNow().notNull(),

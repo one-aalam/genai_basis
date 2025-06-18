@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, gt, sql, cosineDistance } from 'drizzle-orm';
 import { db } from './db';
 import { documents, type Document, type NewDocument } from '@/db/schema';
 import { generateEmbedding } from './embedding';
@@ -23,6 +23,45 @@ export const addDocument = async (doc: Omit<NewDocument, 'embedding'>): Promise<
   } catch (error) {
     console.error('Error adding document:', error);
     throw new Error('Failed to add document');
+  }
+};
+
+/**
+ * Search for similar documents using vector similarity
+ */
+export const searchSimilarDocuments = async (
+  query: string,
+  limit: number = 5,
+  threshold: number = 0.5
+): Promise<Array<Document & { similarity: number }>> => {
+  try {
+    // Generate embedding for the search query
+    const queryEmbedding = await generateEmbedding(query);
+    
+    // Calculate similarity using cosine distance
+    // Cosine similarity = 1 - cosine distance
+    const similarity = sql<number>`1 - (${cosineDistance(documents.embedding, queryEmbedding)})`;
+    
+    const results = await db
+      .select({
+        id: documents.id,
+        title: documents.title,
+        content: documents.content,
+        url: documents.url,
+        embedding: documents.embedding,
+        createdAt: documents.createdAt,
+        updatedAt: documents.updatedAt,
+        similarity,
+      })
+      .from(documents)
+      .where(gt(similarity, threshold)) // Only return results above similarity threshold
+      .orderBy(desc(similarity)) // Order by most similar first
+      .limit(limit);
+
+    return results;
+  } catch (error) {
+    console.error('Error searching documents:', error);
+    throw new Error('Failed to search documents');
   }
 };
 
@@ -66,5 +105,3 @@ export const updateDocument = async (
     
   return updatedDoc;
 };
-
-// @TODO: Introduce functions for vector search
